@@ -6,3 +6,4 @@ data/
 .tmp/
 logs/
 config/nodes.json
+docs_test/
