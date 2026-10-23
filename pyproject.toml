@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "primegrid"
+version = "0.1.0"
+description = "Cálculo exato de primos com crivo segmentado"
+requires-python = ">=3.11"
+dependencies = ["grpcio==1.84.1", "protobuf==7.36.2"]
+
+[project.optional-dependencies]
+dev = ["grpcio-tools==1.84.1", "pytest>=8.4,<10", "pytest-asyncio>=1.4,<2"]
+
+[tool.setuptools.packages.find]
+include = ["primegrid*"]
+
+[tool.setuptools.package-data]
+"primegrid.proto" = ["*.proto"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

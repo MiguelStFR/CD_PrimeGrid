@@ -1,0 +1,10 @@
+{
+  "nodes": [
+    {"id": 1, "host": "192.168.1.10", "port": 50051},
+    {"id": 2, "host": "192.168.1.11", "port": 50051}
+  ],
+  "heartbeat_sec": 2,
+  "failure_after_sec": 6,
+  "lease_sec": 30,
+  "data_dir": "./data"
+}

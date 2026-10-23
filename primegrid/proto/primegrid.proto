@@ -1,0 +1,85 @@
+syntax = "proto3";
+package primegrid;
+
+service PrimeGrid {
+  rpc GetStatus(StatusQuery) returns (Status);
+  rpc StartJob(StartRequest) returns (JobReply);
+  rpc SyncJob(Job) returns (Ack);
+  rpc RequestTask(TaskRequest) returns (TaskReply);
+  rpc SubmitResult(ChunkResult) returns (Ack);
+  rpc Heartbeat(HeartbeatRequest) returns (Ack);
+  rpc Election(Candidate) returns (Ack);
+  rpc Coordinator(Leader) returns (Ack);
+  rpc GetSnapshot(JobQuery) returns (stream Snapshot);
+  rpc GetResult(Empty) returns (Result);
+}
+
+enum Code {
+  OK = 0;
+  NOT_LEADER = 1;
+  TASK = 2;
+  WAIT = 3;
+  DONE = 4;
+}
+message Empty {}
+message StatusQuery { bool local_only = 1; }
+message Leader { uint64 node_id = 1; string endpoint = 2; }
+message Ack { Code code = 1; Leader leader = 2; string message = 3; }
+message StartRequest {
+  uint64 start = 1;
+  uint64 end = 2;
+  uint64 chunk_size = 3;
+  string mode = 4;
+}
+message Job {
+  string job_id = 1;
+  StartRequest spec = 2;
+  double created_at = 3;
+  uint64 leader_id = 4;
+}
+message JobReply { Code code = 1; Leader leader = 2; string job_id = 3; }
+message Status {
+  Code code = 1;
+  Leader leader = 2;
+  string job_id = 3;
+  string state = 4;
+  uint64 total_chunks = 5;
+  uint64 completed_chunks = 6;
+  uint64 in_progress_chunks = 7;
+  repeated uint64 active_nodes = 8;
+}
+message TaskRequest { string job_id = 1; uint64 worker_id = 2; }
+message TaskReply {
+  Code code = 1;
+  Leader leader = 2;
+  uint64 chunk_id = 3;
+  uint64 start = 4;
+  uint64 end = 5;
+}
+message ChunkResult {
+  string job_id = 1;
+  uint64 chunk_id = 2;
+  uint64 prime_count = 3;
+  repeated uint64 primes = 4;
+  uint64 worker_id = 5;
+}
+message HeartbeatRequest {
+  uint64 node_id = 1;
+  string job_id = 2;
+  optional uint64 active_chunk_id = 3;
+}
+message Candidate { uint64 node_id = 1; }
+message JobQuery { string job_id = 1; }
+message Snapshot { Job job = 1; string state = 2; ChunkResult result = 3; }
+message Result {
+  Code code = 1;
+  Leader leader = 2;
+  string job_id = 3;
+  string state = 4;
+  uint64 prime_count = 5;
+  repeated uint64 primes = 6;
+  double duration_sec = 7;
+  uint64 total_chunks = 8;
+  uint64 completed_chunks = 9;
+  string mode = 10;
+}
